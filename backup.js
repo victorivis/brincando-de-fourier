@@ -1,7 +1,8 @@
-let angle=0;
-let conjuntoPontos = [{r:200, v:1}, {r:105, v:2}];
-let testePontos = []
-let limite = 30;
+let angulo=0;
+let listaCirculos = [];
+let listaPontos = [];
+let limitePontos = 1000;
+let pausar = false;
 
 //Sliders para teste
 let meuSlider;
@@ -11,15 +12,15 @@ let proporcaoDosCirculos;
 let espacamentoPontos;
 
 function setup(){
-    frameRate(10);
+    frameRate(60);
     createCanvas(1280, 680);
-    meuSlider = createSlider(1, 10, 1, 1);
+    meuSlider = createSlider(1, 50, 10, 1);
     meuSlider.position(width*0.88, 20);
 
-    numeroDePontos = createSlider(1, 9000, 1000, 1);
+    numeroDePontos = createSlider(1, 10**6, 1000, 1);
     numeroDePontos.position(width*0.88, 100);
 
-    numeroDeCirculos = createSlider(1, 15, 5, 1);;
+    numeroDeCirculos = createSlider(1, 15, 2, 1);;
     numeroDeCirculos.position(width*0.88, 180);
 
     proporcaoDosCirculos = createSlider(0.1, 4, 2, 0.1);;
@@ -31,13 +32,23 @@ function setup(){
     angleMode(DEGREES);
 
     for(let i=1; i<10; i++){
-        testePontos.push({r:tamanhoCirculo(i), v:10.0/tamanhoCirculo(i)});
+        listaCirculos.push({r:tamanhoCirculo(i), v:10.0/tamanhoCirculo(i)});
     }
 
-    console.log(meuSlider); 
+    console.log(meuSlider);
+    for(let i=0; i<2; i++){
+        console.log(listaCirculos[i]);
+    }
 }
 
 function draw(){
+    //if(pausar){
+    //    return;
+    //}
+    //else{
+    //    pausar = true;
+    //}
+
     background(0);
     fill(255);
     stroke(200);
@@ -45,28 +56,65 @@ function draw(){
     push();
     translate(width/4, height/2);
 
-    while(testePontos.length < numeroDeCirculos.value()){
-        const tamanho = testePontos.length+1;
-        testePontos.push({r:tamanhoCirculo(tamanho), v:10.0/tamanhoCirculo(tamanho)});
+    while(listaCirculos.length < numeroDeCirculos.value()){
+        const tamanho = listaCirculos.length+1;
+        listaCirculos.push({r:tamanhoCirculo(tamanho), v:10.0/tamanhoCirculo(tamanho)});
     }
-    while(testePontos.length > numeroDeCirculos.value()){
-        testePontos.pop();
+    while(listaCirculos.length > numeroDeCirculos.value()){
+        listaCirculos.pop();
     }
 
-    desenharRastro(testePontos, angle);
+    //desenharRastro(listaCirculos, angulo);
 
     noFill();
-    for(let i=0; i<testePontos.length; i++){
+    for(let i=0; i<listaCirculos.length; i++){
         //rotate(10*angle/tamanhoCirculo(i));
         //console.log(testePontos[i].v * angle);
-        rotate(testePontos[i].v * angle);
-        circle(0, 0, testePontos[i].r);
-        line(0, 0, 0, testePontos[i].r/2);        
-        translate(0, testePontos[i].r/2);
+        rotate(listaCirculos[i].v * angulo);
+        circle(0, 0, listaCirculos[i].r);
+        line(0, 0, 0, listaCirculos[i].r/2);        
+        translate(0, listaCirculos[i].r/2);
+    }    
+
+    pop();
+
+    
+    push();
+    translate(width/4, height/2);
+
+    let novoX=0;
+    let novoY=0;
+
+    let velocidadeAnterior=0;
+
+    for(let i=0; i<listaCirculos.length; i++){
+        velocidadeAnterior+=listaCirculos[i].v;
+
+        let conserta = 0;
+        if(true){
+            conserta = 0;
+        }
+
+        novoX += sin( -angulo * (velocidadeAnterior)) * listaCirculos[i].r/2;
+        novoY += cos( -angulo * (velocidadeAnterior)) * listaCirculos[i].r/2;
+        listaPontos.push({x: novoX, y: novoY, posicao: i});
     }
     
 
-    
+    while(listaPontos.length > limitePontos){
+        listaPontos.shift();
+    }
+
+    fill(255);
+    stroke(234, 200, 0);
+    for(let i=0; i<listaPontos.length; i++){
+        const proporacaoDaCor = 255.0 * (listaPontos[i].posicao+1)/listaCirculos.length;
+        if(i < 30){
+            //console.log(proporacaoDaCor);
+        }
+        stroke( proporacaoDaCor, (120+proporacaoDaCor)%255, (255-proporacaoDaCor) );
+        point(listaPontos[i].x, listaPontos[i].y);
+    }
 
     pop();
 
@@ -74,7 +122,7 @@ function draw(){
     //    desenharPonto(i);
     //}
 
-    angle += meuSlider.value();
+    angulo += meuSlider.value();
     text("Escala: " + meuSlider.value(), meuSlider.x, meuSlider.y+30);
     text("Numero de Pontos: " + numeroDePontos.value(), numeroDePontos.x, numeroDePontos.y+30);
     text("Numero de Circulos: " + numeroDeCirculos.value(), numeroDeCirculos.x, numeroDeCirculos.y+30);

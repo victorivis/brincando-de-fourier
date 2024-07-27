@@ -1,4 +1,4 @@
-let angle=0;
+let angulo=0;
 let conjuntoPontos = [];
 let limite = 30;
 

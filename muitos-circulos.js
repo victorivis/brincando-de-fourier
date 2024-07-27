@@ -53,13 +53,13 @@ function draw(){
         testePontos.pop();
     }
 
-    desenharRastro(testePontos, angle);
+    desenharRastro(testePontos, angulo);
 
     noFill();
     for(let i=0; i<testePontos.length; i++){
         //rotate(10*angle/tamanhoCirculo(i));
         //console.log(testePontos[i].v * angle);
-        rotate(testePontos[i].v * angle);
+        rotate(testePontos[i].v * angulo);
         circle(0, 0, testePontos[i].r);
         line(0, 0, 0, testePontos[i].r/2);        
         translate(0, testePontos[i].r/2);
@@ -74,7 +74,7 @@ function draw(){
     //    desenharPonto(i);
     //}
 
-    angle += meuSlider.value();
+    angulo += meuSlider.value();
     text("Escala: " + meuSlider.value(), meuSlider.x, meuSlider.y+30);
     text("Numero de Pontos: " + numeroDePontos.value(), numeroDePontos.x, numeroDePontos.y+30);
     text("Numero de Circulos: " + numeroDeCirculos.value(), numeroDeCirculos.x, numeroDeCirculos.y+30);
