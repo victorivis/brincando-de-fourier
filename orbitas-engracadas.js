@@ -1,7 +1,7 @@
 let angle=0;
 let conjuntoPontos = [{r:200, v:1}, {r:105, v:2}];
 let testePontos = []
-let limite = 30;
+let limite = 3000;
 let meuSlider;
 
 function setup(){
