@@ -11,23 +11,34 @@ let numeroDeCirculos;
 let proporcaoDosCirculos;
 let espacamentoPontos;
 
+let botaoModoExibicao;
+let mostrarPoligono=true;
+
+let checkBoxes=[];
+
 function setup(){
+    const posicaoX = 0.85;
+
     frameRate(60);
     createCanvas(1280, 680);
-    meuSlider = createSlider(1, 50, 10, 1);
-    meuSlider.position(width*0.88, 20);
+    meuSlider = createSlider(1, 400, 30, 1);
+    meuSlider.position(width*posicaoX, 20);
 
-    numeroDePontos = createSlider(1, 10**6, 1000, 1);
-    numeroDePontos.position(width*0.88, 100);
+    numeroDePontos = createSlider(1, 10**7, 10**6, 1);
+    numeroDePontos.position(width*posicaoX, 100);
 
-    numeroDeCirculos = createSlider(1, 15, 2, 1);;
-    numeroDeCirculos.position(width*0.88, 180);
+    numeroDeCirculos = createSlider(1, 15, 4, 1);;
+    numeroDeCirculos.position(width*posicaoX, 180);
 
-    proporcaoDosCirculos = createSlider(0.1, 4, 2, 0.1);;
-    proporcaoDosCirculos.position(width*0.88, 260);
+    proporcaoDosCirculos = createSlider(0.1, 4, 2.01, 0.01);;
+    proporcaoDosCirculos.position(width*posicaoX, 260);
 
     espacamentoPontos = createSlider(1, 50, 5, 1);;
-    espacamentoPontos.position(width*0.88, 340);
+    espacamentoPontos.position(width*posicaoX, 340);
+
+    botaoModoExibicao = createButton("Trocar modo de exibição");
+    botaoModoExibicao.mouseClicked(trocarExibicao);
+    botaoModoExibicao.position(width*posicaoX, 600);
 
     angleMode(DEGREES);
 
@@ -42,6 +53,7 @@ function setup(){
 }
 
 function draw(){
+    let limitePontos = numeroDePontos.value();
     //if(pausar){
     //    return;
     //}
@@ -52,6 +64,18 @@ function draw(){
     background(0);
     fill(255);
     stroke(200);
+
+    while(checkBoxes.length < numeroDeCirculos.value()){    
+        const atual = checkBoxes.length;
+        checkBoxes.push(createCheckbox("", true));
+        checkBoxes[atual].position(width*0.85 + 30*(atual%5), 470 + 30*parseInt(atual/5));
+
+        //console.log(checkBoxes[i]); 
+    }
+    while(checkBoxes.length > numeroDeCirculos.value()){
+        checkBoxes[checkBoxes.length-1].remove();
+        checkBoxes.pop();
+    }
 
     push();
     translate(width/4, height/2);
@@ -105,15 +129,36 @@ function draw(){
         listaPontos.shift();
     }
 
-    fill(255);
-    stroke(234, 200, 0);
-    for(let i=0; i<listaPontos.length; i++){
-        const proporacaoDaCor = 255.0 * (listaPontos[i].posicao+1)/listaCirculos.length;
-        if(i < 30){
-            //console.log(proporacaoDaCor);
+    noFill();
+    
+    for(let j=0; j<listaCirculos.length; j++){
+        if(checkBoxes[j].checked()){
+            const proporacaoDaCor = 255.0 * (j+1)/listaCirculos.length;
+            stroke( proporacaoDaCor, (120+proporacaoDaCor)%255, (255-proporacaoDaCor) );
+
+            //Exibe linhas
+            if(mostrarPoligono){
+                beginShape();
+                for(let i=0; i<listaPontos.length; i++){
+
+                    if(listaPontos[i].posicao == j){
+                        vertex(listaPontos[i].x, listaPontos[i].y);
+                        //point(listaPontos[i].x, listaPontos[i].y);
+                    }
+                    
+                }
+                endShape();
+            }
+
+            //Exibe pontilhado
+            else{
+                for(let i=0; i<listaPontos.length; i++){
+                    if(listaPontos[i].posicao == j){
+                        point(listaPontos[i].x, listaPontos[i].y);
+                    }                  
+                }
+            }
         }
-        stroke( proporacaoDaCor, (120+proporacaoDaCor)%255, (255-proporacaoDaCor) );
-        point(listaPontos[i].x, listaPontos[i].y);
     }
 
     pop();
@@ -128,7 +173,7 @@ function draw(){
     text("Numero de Circulos: " + numeroDeCirculos.value(), numeroDeCirculos.x, numeroDeCirculos.y+30);
     text("Proporcao dos circulos: " + proporcaoDosCirculos.value(), proporcaoDosCirculos.x, proporcaoDosCirculos.y+30);
     text("Espaçamento pontos: " + espacamentoPontos.value(), espacamentoPontos.x, espacamentoPontos.y+30);
-    
+    text("Visualizar Circulos", espacamentoPontos.x, 450);
 }
 
 function desenharPonto(angulo){
@@ -180,4 +225,8 @@ function desenharRastro(lista, angulo){
 
         pop();
     }
+}
+
+function trocarExibicao(){
+    mostrarPoligono = !mostrarPoligono;
 }
